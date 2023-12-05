@@ -2,7 +2,7 @@
 
 ### Human Tumor Atlas Network (HTAN) Data Jamboree | Dec. 4-7, 2023 
 
-## Problem overview
+## Background
 
 ## About the data 
 
@@ -12,7 +12,20 @@ Analyzed here are paired scRNA-seq and MERFISH datasets from 9 samples derived f
 
 ![plot](./figures/HTAPP_MERFISH_sample_cellcount_barplot.png)
 
+## Analysis goals 
+
+- Integrate the data 
+- Transfer cell type labels between modalities 
+- Determine which method works best for this particular problem 
+- Draw novel biological conclusions from the integrated dataset 
+
 ## Basic workflow 
+
+- Data ingress and pre-processing 
+- Integration: `Method 1`
+- Integration: `Method 2`
+- Evaluation
+- Downstream analysis
 
 ## Results 
 
@@ -20,9 +33,9 @@ Analyzed here are paired scRNA-seq and MERFISH datasets from 9 samples derived f
 
 ## Team 
 
-**John Duc Nguyen**, Genentech 
-**Jon Akutagawa**, University of California
-**Xiyue Zhao**, Oregon Health and Science University
-**Mark Dane**, Oregon Health and Science University
-**Cameron Watson**, Oregon Health and Science University
-**Gautam Machiraju**, Stanford University
+- **John Duc Nguyen**, Genentech 
+- **Jon Akutagawa**, University of California
+- **Xiyue Zhao**, Oregon Health and Science University
+- **Mark Dane**, Oregon Health and Science University
+- **Cameron Watson**, Oregon Health and Science University
+- **Gautam Machiraju**, Stanford University
