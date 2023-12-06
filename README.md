@@ -34,7 +34,7 @@ Analyzed here are paired scRNA-seq and MERFISH datasets from 9 samples derived f
 ## Team 
 
 - **John Duc Nguyen**, Genentech 
-- **Jon Akutagawa**, University of California
+- **Jon Akutagawa**, University of California, San Francisco
 - **Xiyue Zhao**, Oregon Health and Science University
 - **Mark Dane**, Oregon Health and Science University
 - **Cameron Watson**, Oregon Health and Science University
