@@ -1,0 +1,220 @@
+```{r}
+library(Seurat)
+library(dplyr)
+library(SeuratData)
+library(patchwork) 
+library(ggplot2)
+library(CellChat)
+library(ggalluvial)
+library(svglite)
+library(SeuratDisk)
+
+rm(list=ls()) 
+options(stringsAsFactors = F) 
+getwd()
+```
+
+```{python}
+#reticulate::repl_python()
+
+import scanpy as sc
+import numpy as np
+
+adata = sc.read_h5ad('<path>') #Tengram ad_ge.h5ad file
+#meta_data = adata.obs
+adata_X = adata.X
+#adata.var_names = [s.upper() for s in adata.var_names]
+gene_names = np.array([s.upper() for s in adata.var_names])
+
+cell_type = sc.read_h5ad('<path>') #cell type path
+cell_type = cell_type.obs['cell_type']
+cell_type_name = np.array(cell_type.index)
+cell_type_content = np.array(cell_type)
+```
+
+```{r}
+library(reticulate)
+counts <- py$adata_X
+gene_names <- py$gene_names
+cell_type_name <- py$cell_type_name
+cell_type <- as.data.frame(py$cell_type_content)
+rownames(cell_type) <- cell_type_name
+
+counts <- as.data.frame(counts)
+rownames(counts) <- cell_type_name
+colnames(counts) <- gene_names
+counts[counts < 0.00001] <- 0 # 184667630  260145458
+```
+
+
+```{r}
+seuratObject <- CreateSeuratObject(t(counts), assay = "RNA", meta.data = cell_type)
+Idents(object = seuratObject) <- "py$cell_type_content"
+```
+
+
+```{r}
+seuratObject <- NormalizeData(seuratObject, normalization.method = "LogNormalize")
+seuratObject <- FindVariableFeatures(seuratObject, selection.method = "vst", nfeatures = 2000)
+all.genes <- rownames(seuratObject)
+seuratObject <- ScaleData(seuratObject, features = all.genes)
+seuratObject <- RunPCA(seuratObject, features = VariableFeatures(object = seuratObject))
+
+```
+
+```{r}
+CellChatDB <- CellChatDB.human 
+colnames(CellChatDB$interaction) 
+
+
+CellChatDB$interaction[1:4,1:4]
+head(CellChatDB$cofactor)
+head(CellChatDB$complex)
+head(CellChatDB$geneInfo)
+```
+
+```{r}
+cellchat <- createCellChat(object = seuratObject, meta = seuratObject@meta.data, group.by = "py.cell_type_content")
+CellChatDB <- CellChatDB.human
+
+dplyr::glimpse(CellChatDB$interaction)
+```
+
+```{r}
+## use a subset of CellChatDB for cell-cell communication analysis
+#CellChatDB.use <- subsetDB(CellChatDB, search = "Cell-Cell Contact")   # use Secreted Signaling
+
+CellChatDB.use <- CellChatDB # simply use the default CellChatDB
+
+##set the used database in the object
+cellchat@DB <- CellChatDB.use
+unique(CellChatDB$interaction$annotation)
+```
+
+
+```{r}
+##subset the expression data of signaling genes for saving computation cost
+cellchat <- subsetData(cellchat)      # This step is necessary even if using the whole database
+future::plan("multisession", workers = 4)
+cellchat <- identifyOverExpressedGenes(cellchat)
+cellchat <- identifyOverExpressedInteractions(cellchat)
+cellchat <- projectData(cellchat, PPI.human) 
+```
+
+```{r}
+cellchat <- computeCommunProb(cellchat,raw.use = FALSE)    
+##Filter out the cell-cell communication if there are only few number of cells in certain cell groups
+cellchat <- filterCommunication(cellchat, min.cells = 100)
+```
+
+```{r}
+cellchat <- computeCommunProbPathway(cellchat)
+
+##Calculate the aggregated cell-cell communication network
+cellchat <- aggregateNet(cellchat)    
+cellchat@netP$pathways
+head(cellchat@LR$LRsig)
+```
+
+
+```{r}
+##showing the number of interactions or the total interaction strength (weights) between any two cell groups using circle plot.
+groupSize <- as.numeric(table(cellchat@idents))
+par(mfrow = c(1,2), xpd=TRUE)
+netVisual_circle(cellchat@net$count, vertex.weight = groupSize, weight.scale = T, label.edge= F, title.name = "Number of interactions")
+netVisual_circle(cellchat@net$weight, vertex.weight = groupSize, weight.scale = F, label.edge= F, title.name = "Interaction weights/strength")
+```
+
+```{r}
+##Here we also control the parameteredge.weight.maxso that we can compare edge weights between differet networks.
+
+mat <- cellchat@net$weight
+#par(mfrow = c(3,4), xpd=TRUE)
+#for (i in 1:nrow(mat)) {
+#  mat2 <- matrix(0, nrow = nrow(mat), ncol = ncol(mat), dimnames = dimnames(mat))
+#  mat2[i, ] <- mat[i, ]
+#  netVisual_circle(mat2, vertex.weight = groupSize, weight.scale = T, edge.weight.max = max(mat), title.name = rownames(mat)[i])
+#}
+mat2 <- matrix(0, nrow = nrow(mat), ncol = ncol(mat), dimnames = dimnames(mat))
+mat2[1, ] <- mat[1, ]
+netVisual_circle(mat2, vertex.weight = groupSize, weight.scale = T, edge.weight.max = max(mat), title.name = rownames(mat)[1])
+
+```
+
+```{r}
+####Hierarchy plot, Circle plot or Chord diagram
+##All the signaling pathways showing significant communications can be accessed by
+cellchat@netP$pathways
+```
+
+
+```{r}
+pathways.show <- c("MHC-II")  
+#### Hierarchy plot 
+
+## 
+levels(cellchat@idents)   
+
+vertex.receiver = seq(1,4)      # a numeric vector
+vertex.receiver <- 1
+
+
+netVisual_aggregate(cellchat, signaling = pathways.show,  vertex.receiver = vertex.receiver)
+####---Circle plot
+par(mfrow=c(1,1)) 
+netVisual_aggregate(cellchat, signaling = pathways.show, layout = "circle")
+
+par(mfrow=c(1,1))
+netVisual_aggregate(cellchat, signaling = pathways.show, layout = "chord")
+
+par(mfrow=c(1,1))
+netVisual_heatmap(cellchat, signaling = pathways.show, color.heatmap = "Reds")
+#> Do heatmap based on a single object
+```
+
+
+
+```{r}
+#Contribution of each lr pair for choosing pathway
+netAnalysis_contribution(cellchat, signaling = pathways.show)
+
+```
+
+```{r}
+####visualize the cell-cell communication mediated by a single ligand-receptor pair
+pairLR.MIF <- extractEnrichedLR(cellchat, signaling = pathways.show, geneLR.return = FALSE)
+LR.show <- pairLR.MIF[1,]     # show one ligand-receptor pair
+## Hierarchy plot
+vertex.receiver <- 1  
+netVisual_individual(cellchat, signaling = pathways.show,  pairLR.use = LR.show, vertex.receiver = vertex.receiver)
+```
+
+
+
+
+```{r}
+#"TGFb"       "VEGF"       "NT"         "COMPLEMENT"
+#"ICAM"  "EPHA"  "L1CAM" "EPHB"  "THY1"  "GP1BA"
+#"MHC-II"    "MHC-I" 
+plotGeneExpression(cellchat, signaling = "MHC-II", enriched.only = FALSE)
+plotGeneExpression(cellchat, signaling = "MHC-I", enriched.only = FALSE)
+```
+
+
+```{r}
+##Identify signaling roles (e.g., dominant senders, receivers) of cell groups as well as the major contributing signaling
+# Compute the network centrality scores
+cellchat <- netAnalysis_computeCentrality(cellchat, slot.name = "netP")    # the slot 'netP' means the inferred intercellular communication network of signaling pathways
+
+# Visualize the computed centrality scores using heatmap, allowing ready identification of major signaling roles of cell groups， 
+
+netAnalysis_signalingRole_network(cellchat, signaling = pathways.show, width = 8, height = 2.5, font.size = 10)
+```
+
+```{r}
+##Identify signals contributing most to outgoing or incoming signaling of certain cell groups
+# Signaling role analysis on the aggregated cell-cell communication network from all signaling pathways
+ht1 <- netAnalysis_signalingRole_heatmap(cellchat, pattern = "outgoing")
+ht2 <- netAnalysis_signalingRole_heatmap(cellchat, pattern = "incoming")
+ht1 + ht2
+```
