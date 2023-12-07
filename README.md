@@ -4,7 +4,7 @@
 
 ---
 
-Here, we explore integration methods to leverage the complementary advantages of scRNA-seq and MERFISH spatial transcriptomic technologies. scRNA-seq enables whole transcriptome profiling at the single cell level, but does not preserve the spatial context of the tissue. MERFISH provides transcript signatures for single cells while preserving cell spatial information within a tissue, but is limited in transcipt panel size and sequencing depth. Integrating the two assays that were run on paired samples from an HTAN metastatic breast cancer cohort allows us to 1. evaluate he best tools for integrating this type of data, and 2. elucidate new biological insights not previously established by analyzing the modalities separately. 
+Here, we explore integration methods to leverage the complementary advantages of scRNA-seq and MERFISH spatial transcriptomic technologies. scRNA-seq enables whole transcriptome profiling at the single cell level, but does not preserve the spatial context of the tissue. MERFISH provides transcript signatures for single cells while preserving cell spatial information within a tissue, but is limited in transcipt panel size and sequencing depth. Integrating the two assays that were run on paired samples from an HTAN metastatic breast cancer cohort allows us to 1. evaluate the best tools for integrating this type of data, and 2. elucidate new biological insights not previously established by analyzing the modalities separately. 
 
 *Disclaimer* This work was done over a very short period for a hackathon, and represents a preliminary effort. With this in mind, code is not optimized, and there is ample room for further work. 
 
@@ -22,7 +22,7 @@ Analyzed here are paired scRNA-seq and MERFISH datasets from 9 samples derived f
 
 Figure 1 shows total cell counts from the MERFISH samples. Each MERFISH dataset had a paired scRNA-seq dataset derived from the same biospecimen. For this project, we successfully integrated all datasets using both Tangram and MaxFuse; however, analysis was only performed on the sample **HTAPP-313** due to time contraints. Future work would involve a comprehensive comparison of the entire cohort. 
 
-# Figure 1.
+### Figure 1.
 ![plot](./figures/HTAPP_MERFISH_sample_cellcount_barplot.png)
 
 ## Analysis goals 
@@ -42,8 +42,9 @@ Figure 1 shows total cell counts from the MERFISH samples. Each MERFISH dataset 
 - **Pre-processing**
     - Separate pre-processing pipelines were set up for MERFISH and scRNA-seq. In short these processes are described below:
     - MERFISH
-        - Cell centroids were calculated for each cell from the middle slice of the 3D z-stack using the Shapely Python package. See
-          notebook: `pre_processing/MERFISH_preprocessing.ipynb`
+        - Cell centroids were calculated for each cell from the middle slice of the 3D z-stack using the Shapely Python package. In the
+          future, using the full 3D z-stack could be an interesting course of investigation. 
+          See notebook: `pre_processing/MERFISH_preprocessing.ipynb`
         - Control probes were removed from the expression matrix, all transcript counts were normalized, and cell types were annotated
           manually using Leiden clustering implemented in Scanpy. 
           See notebook for an example on one sample: `pre_processing/MERFISH_celltype_514.ipynb`
@@ -54,7 +55,7 @@ Figure 1 shows total cell counts from the MERFISH samples. Each MERFISH dataset 
 - **Integration**
 - **Evaluation & Downstream analysis**
 
-# Figure 2.
+### Figure 2.
 ![overview](./figures/pipeline_overview.png)
 
 ## Results 
