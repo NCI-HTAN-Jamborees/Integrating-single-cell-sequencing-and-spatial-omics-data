@@ -28,6 +28,8 @@ Analyzed here are paired scRNA-seq and MERFISH datasets from 9 samples derived f
 
 ## Basic workflow 
 
+![overview](./figures/pipeline_overview.png)
+
 - Data ingress and pre-processing 
 - Integration: `Method 1`
 - Integration: `Method 2`
@@ -35,6 +37,12 @@ Analyzed here are paired scRNA-seq and MERFISH datasets from 9 samples derived f
 - Downstream analysis
 
 ## Results 
+
+![results1](./figures/MaxFuse_integration_results.png)
+
+![results2](./figures/tangram_313_scRNAfeatures_MERFISHlabels.png)
+
+![results3](./figures/MERFISH_integrated_spatial.png)
 
 ## Future directions 
 
