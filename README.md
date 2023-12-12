@@ -22,7 +22,7 @@ Analyzed here are paired scRNA-seq and MERFISH datasets from 9 samples derived f
 
 Figure 1 shows total cell counts from the MERFISH samples. Each MERFISH dataset had a paired scRNA-seq dataset derived from the same biospecimen. For this project, we successfully integrated all datasets using both Tangram and MaxFuse; however, analysis was only performed on the sample **HTAPP-313** due to time contraints. Future work would involve a comprehensive comparison of the entire cohort. 
 
-### Figure 1.
+### Figure 1. Dataset overview
 ![plot](./figures/HTAPP_MERFISH_sample_cellcount_barplot.png)
 
 ## Analysis goals 
@@ -35,7 +35,7 @@ Figure 1 shows total cell counts from the MERFISH samples. Each MERFISH dataset 
 
 ## Workflow and results
 
-### Figure 2. 
+### Figure 2. Workflow diagram 
 ![overview](./figures/pipeline_overview.png)
 
 - **Data ingress**
@@ -65,24 +65,23 @@ Figure 1 shows total cell counts from the MERFISH samples. Each MERFISH dataset 
           shared features across the two modalities. Training was performed using all shared features. The Tangram functions `tg.map_cells_to_space()` and `tg.project_genes()` were used to integrate the data and map scRNA-seq cells and gene expression to the MERFISH spatial context ([See the Tangram Github repository for docs and tutorials](https://github.com/broadinstitute/Tangram)). 
           See notebook: `integration/tangram_integration.ipynb`
 - **Evaluation & Downstream analysis**
-    - Briefly, a number of downstream analyses were conducted to:
-        1. Attempt to assess the quality of the intergation by both MaxFuse and Tangram 
-        2. Draw biological insights from the integrated datasets 
+    - Briefly, a number of downstream analyses were conducted to 1. Attempt to assess the quality of the intergation by both MaxFuse and
+      Tangram and 2. Draw biological insights from the integrated datasets. 
     - UMAP plots, implemented in `scanpy` were generated to assess the quality of integration. The UMAP plots were colored by cell-type
       annotations, generated on the two modalities separately, on both the pre-integration and post-integration data. UMAP plots were also color annotated by the modality that each cell originated from on both the pre-integration and post-integration data. In both cases, the integration seemed to successfully remove the effect of the modalities in UMAP space (Figure 3). Additionally, after integration, cell type annotations from the two modalities overlapped on UMAP plot. For example, the separate `Macrophage` and `Monocyte` annotations were generated using the scRNA-seq data, and the `Macrophage_Monocyte` annotation was generated on the MERFISH data since the MERFISH panel did not have the genes to differentiate these lineages. The arrows (Figure 3) show these populations clustering together after integration of the modalities, suggesting that the integration removes the effect of modality, but maintains biological variation by cell type. Similarly, we created a UMAP plot for the Tangram scRNA-seq gene expression that was imposed onto the MERFISH data (Figure 4), and annotated using the original MERFISH labels. This figure shows that the MERFISH labels were recapitulated when clustering the integrated scRNA-seq data. 
       See notebooks: `integration/merfish_scRNAseq_MaxFuse.ipynb` and `downstream_analysis/post_tangram_clustering.ipynb`
 
-      ## Figure 3.
+      ### Figure 3. MaxFuse integration results
       ![results1](./figures/MaxFuse_integration_results.png)
 
-      ## Figure 4. 
+      ### Figure 4. Tangram integration results 
       ![results2](./figures/tangram_313_scRNAfeatures_MERFISHlabels.png)
 
     - For the Tangram integration, we were able to project the scRNA-seq gene expression into the MERFISH spatial context, and plot the
       MERFISH cell centroids overlaid with scRNA-seq gene expression and cell types derived from scRNA-seq. This was possible due to Tangram's built-in function `tg.project_genes()`. We plotted the original MERFISH cell type labels by their spatial coordinates (Figure 5, left) next to the scRNA-seq cell type labels projected into the MERFISH spatial context (Figure 5, right). Generally, we see that the spatial abundance patterns match well for these high level cell phenotypes at a qualitative level. In the time alloted during the hackathon, we were unable to perform the same downstream analysis for MaxFuse. It appeared that only the MaxFuse integrated latent space is returned, as opposed to projecting the scRNA-seq gene expression into the spatial context. Further work is necessary to see if we are able to perform this using the MaxFuse integrated data. 
       See notebook: `downstream_analysis/plot_merfish_spatial.ipynb`
 
-      ## Figure 5. 
+      ### Figure 5. Mapping scRNA-seq to MERFISH spatial context 
       ![results3](./figures/MERFISH_integrated_spatial.png)
 
     - The Python package `Squidpy` was used to explore spatial cell-cell interactions in both the original MERFISH data, and the projected
