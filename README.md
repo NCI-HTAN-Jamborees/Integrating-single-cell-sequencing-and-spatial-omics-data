@@ -93,16 +93,16 @@ Figure 1 shows total cell counts from the MERFISH samples. Each MERFISH dataset 
 
 ## Future directions and takeaways 
 
-    - As stated above, we were not able to use the MaxFuse integrated data to project gene expression into the spatial context, as we did 
-      using Tangram. This may be possible, but would require more time to perform this analysis. 
-    - Much more work is needed to quantitatively assess the integration performance of these two piplines for these data. We started
-      calculating some spatial metrics to compare the Tangram projected cell types to the spatial arrangement of the original MERFISH labels, but were unable to complete this analysis in the alloted time. 
-    - Other downstream analyses would include cell-cell communication, and cohort-level analysis. An example of this would be looking at gene
-      expression modules or topics that vary spatially or by cell type between samples with different breast cancer subtypes or other clinical annotations. 
-    - There are many directions that could build upon this work. The HTAPP dataset includes histological images that could be used to bolster
-      the analysis of these datasets. Other paired datasets with scRNA-seq, spatial transcriptomics, and spatial proteomics assays would be of particular interest for a multimodal integration analysis. 
-    - A major goal of the HTAN data jamboree was to generate feedback for the HTAN data portal. While all data portals have a learning curve
-      for usage, the HTAN data portal was generally useable. The biggest blocker for this project was navigating multiple different metadata sources from within the HTAN data portal to establish which samples were paired between the modalities. Given that multimodal analyses are a cornerstone of the HTAN project, linking paired samples in a more intuitive way would be very helpful for future work. 
+  - As stated above, we were not able to use the MaxFuse integrated data to project gene expression into the spatial context, as we did 
+    using Tangram. This may be possible, but would require more time to perform this analysis. 
+  - Much more work is needed to quantitatively assess the integration performance of these two piplines for these data. We started
+    calculating some spatial metrics to compare the Tangram projected cell types to the spatial arrangement of the original MERFISH labels, but were unable to complete this analysis in the alloted time. 
+  - Other downstream analyses would include cell-cell communication, and cohort-level analysis. An example of this would be looking at gene
+    expression modules or topics that vary spatially or by cell type between samples with different breast cancer subtypes or other clinical annotations. 
+  - There are many directions that could build upon this work. The HTAPP dataset includes histological images that could be used to bolster
+    the analysis of these datasets. Other paired datasets with scRNA-seq, spatial transcriptomics, and spatial proteomics assays would be of particular interest for a multimodal integration analysis. 
+  - A major goal of the HTAN data jamboree was to generate feedback for the HTAN data portal. While all data portals have a learning curve
+    for usage, the HTAN data portal was generally useable. The biggest blocker for this project was navigating multiple different metadata sources from within the HTAN data portal to establish which samples were paired between the modalities. Given that multimodal analyses are a cornerstone of the HTAN project, linking paired samples in a more intuitive way would be very helpful for future work. 
 
 ## Team 
 
