@@ -4,7 +4,7 @@
 
 ---
 
-Here, we explore integration methods to leverage the complementary advantages of scRNA-seq and MERFISH spatial transcriptomic technologies. scRNA-seq enables whole transcriptome profiling at the single cell level, but does not preserve the spatial context of the tissue. MERFISH provides transcript signatures for single cells while preserving cell spatial information within a tissue, but is limited in transcipt panel size and sequencing depth. Integrating the two assays that were run on paired samples from an HTAN metastatic breast cancer cohort allows us to 1. evaluate the best tools for integrating this type of data, and 2. elucidate new biological insights not previously established by analyzing the modalities separately. 
+Here, we explore integration methods to leverage the complementary advantages of scRNA-seq and MERFISH spatial transcriptomic technologies. scRNA-seq enables whole transcriptome profiling at the single cell level, but does not preserve the spatial context of the tissue. MERFISH provides transcript signatures for single cells while preserving cell spatial information within a tissue, but is limited in transcript panel size and sequencing depth. Integrating the two assays that were run on paired samples from an HTAN metastatic breast cancer cohort allows us to 1. evaluate the best tools for integrating this type of data, and 2. elucidate new biological insights not previously established by analyzing the modalities separately. 
 
 *Disclaimer* This work was done over a very short period for a hackathon, and represents a preliminary effort. With this in mind, code is not optimized, and there is ample room for further work. 
 
@@ -37,23 +37,45 @@ Figure 1 shows total cell counts from the MERFISH samples. Each MERFISH dataset 
 
 - **Data ingress**
     - HTAN level 3 and 4 data ([Learn more about the HTAN data model](https://humantumoratlas.org/standards)) for scRNA-seq and MERFISH were
-      accessed using syanpseclient. See notebook: `data_ingress/Data_extraction.ipynb`
-    - Metadata was accessed and merged with datasets using the HTAN data portal and Google BigQuery 
+      accessed using `syanpseclient`. See notebook: `data_ingress/Data_extraction.ipynb`
+    - Metadata was accessed and merged with datasets using the HTAN data portal and `google-cloud-bigquery`.
 - **Pre-processing**
     - Separate pre-processing pipelines were set up for MERFISH and scRNA-seq. In short these processes are described below:
     - MERFISH
-        - Cell centroids were calculated for each cell from the middle slice of the 3D z-stack using the Shapely Python package. In the
+        - Cell centroids were calculated for each cell from the middle slice of the 3D z-stack using the `shapely` Python package. In the
           future, using the full 3D z-stack could be an interesting course of investigation. 
           See notebook: `pre_processing/MERFISH_preprocessing.ipynb`
         - Control probes were removed from the expression matrix, all transcript counts were normalized, and cell types were annotated
-          manually using Leiden clustering implemented in Scanpy. 
+          manually using Leiden clustering implemented in `scanpy`. 
           See notebook for an example on one sample: `pre_processing/MERFISH_celltype_514.ipynb`
     - scRNA-seq
-        - Using Scanpy, cells were filtered based on mitochondrial counts, genes were filtered based on expression, and transcript counts
-          were normalized. Clustering and gene rankings, also implemented in Scanpy, were used to validate cell type labels that were available in the HTAN metadata. 
+        - Using `scanpy`, cells were filtered based on mitochondrial counts, genes were filtered based on expression, and transcript counts
+          were normalized. Clustering and gene rankings, also implemented in `scanpy`, were used to validate cell type labels that were available in the HTAN metadata. 
           See notebook: `pre_processing/preprocess_scrna.ipynb`
 - **Integration**
+    - MaxFuse Integration 
+        - Shared features were found across the two modalities and stored as an array, and a subset of highly variable shared features were
+          used as initial linkages for integration. Separate "active" arrays were created with non-overlapping features that would be used in the iterative refinement step of the MaxFuse pipeline ([See MaxFuse tutorial](https://maxfuse.readthedocs.io/en/latest/tutorials.html)). Since cell type labels were already generated for both modalities, these were input as labels into the main MaxFuse object. Data were split into batches for nearest-neighbor graph construction to reduce memory burden. The number of Principle Components to use for graph construction were determined for each assay using the elbow method.
+          See notebook: `integration/merfish_scRNAseq_MaxFuse.ipynb`
+    - Tangram Integration 
+        - The MERFISH and scRNA-seq data were read in `anndata` format using `scanpy`. Tangram's custom pre-processing tool was used to find
+          shared features across the two modalities. Training was performed using all shared features. The Tangram functions `tg.map_cells_to_space()` and `tg.project_genes()` were used to integrate the data and map scRNA-seq cells and gene expression to the MERFISH spatial context ([See the Tangram Github repository for docs and tutorials](https://github.com/broadinstitute/Tangram)). 
+          See notebook: `integration/tangram_integration.ipynb`
 - **Evaluation & Downstream analysis**
+    - Briefly, a number of downstream analyses were conducted to:
+        1. Attempt to assess the quality of the intergation by both MaxFuse and Tangram 
+        2. Draw biological insights from the integrated datasets 
+    - UMAP plots, implemented in `scanpy` were generated to assess the quality of integration. The UMAP plots were colored by cell-type
+      annotations, generated on the two modalities separately, on both the pre-integration and post-integration data. UMAP plots were also color annotated by the modality that each cell originated from on both the pre-integration and post-integration data. 
+      See notebooks: `integration/merfish_scRNAseq_MaxFuse.ipynb` and `downstream_analysis/post_tangram_clustering.ipynb`
+    - For the Tangram integration, we were able to project the scRNA-seq gene expression into the MERFISH spatial context, and plot the
+      MERFISH cell centroids overlaid with scRNA-seq gene expression and cell types derived from scRNA-seq. This was possible due to Tangram's built-in function `tg.project_genes()`. In the time alloted during the hackathon, we were unable to perform the same downstream analysis for MaxFuse. It appeared that only the MaxFuse integrated latent space is returned, as opposed to projecting the scRNA-seq gene expression into the spatial context. Further work is necessary to see if we are able to perform this using the MaxFuse integrated data. 
+      See notebook: `downstream_analysis/plot_merfish_spatial.ipynb`
+    - The Python package `Squidpy` was used to explore spatial cell-cell interactions in both the original MERFISH data, and the projected
+      Tangram data. More work for interpreting and connecting this with other analyses is needed. 
+    - The R packages `Seurat` and `CellChat` were used to create cell-cell communication networks for the scRNA-seq data, and the Tangram
+      integrated data; however, more time was needed to complete the analysis. 
+      See R-markdown file: `downstream_analysis/CCC_CellChat.Rmd`
 
 ### Figure 2.
 ![overview](./figures/pipeline_overview.png)
