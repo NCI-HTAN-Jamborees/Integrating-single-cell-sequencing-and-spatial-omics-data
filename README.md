@@ -33,7 +33,10 @@ Figure 1 shows total cell counts from the MERFISH samples. Each MERFISH dataset 
 - Determine pro's and con's of each integration method  
 - Draw novel biological conclusions from the integrated dataset 
 
-## Basic workflow 
+## Workflow and results
+
+### Figure 2. 
+![overview](./figures/pipeline_overview.png)
 
 - **Data ingress**
     - HTAN level 3 and 4 data ([Learn more about the HTAN data model](https://humantumoratlas.org/standards)) for scRNA-seq and MERFISH were
@@ -68,25 +71,25 @@ Figure 1 shows total cell counts from the MERFISH samples. Each MERFISH dataset 
     - UMAP plots, implemented in `scanpy` were generated to assess the quality of integration. The UMAP plots were colored by cell-type
       annotations, generated on the two modalities separately, on both the pre-integration and post-integration data. UMAP plots were also color annotated by the modality that each cell originated from on both the pre-integration and post-integration data. 
       See notebooks: `integration/merfish_scRNAseq_MaxFuse.ipynb` and `downstream_analysis/post_tangram_clustering.ipynb`
+
+      ## Figure 3.
+      ![results1](./figures/MaxFuse_integration_results.png)
+
+      ## Figure 4. 
+      ![results2](./figures/tangram_313_scRNAfeatures_MERFISHlabels.png)
+
     - For the Tangram integration, we were able to project the scRNA-seq gene expression into the MERFISH spatial context, and plot the
       MERFISH cell centroids overlaid with scRNA-seq gene expression and cell types derived from scRNA-seq. This was possible due to Tangram's built-in function `tg.project_genes()`. In the time alloted during the hackathon, we were unable to perform the same downstream analysis for MaxFuse. It appeared that only the MaxFuse integrated latent space is returned, as opposed to projecting the scRNA-seq gene expression into the spatial context. Further work is necessary to see if we are able to perform this using the MaxFuse integrated data. 
       See notebook: `downstream_analysis/plot_merfish_spatial.ipynb`
+
+      ## Figure 5. 
+      ![results3](./figures/MERFISH_integrated_spatial.png)
+
     - The Python package `Squidpy` was used to explore spatial cell-cell interactions in both the original MERFISH data, and the projected
       Tangram data. More work for interpreting and connecting this with other analyses is needed. 
     - The R packages `Seurat` and `CellChat` were used to create cell-cell communication networks for the scRNA-seq data, and the Tangram
       integrated data; however, more time was needed to complete the analysis. 
       See R-markdown file: `downstream_analysis/CCC_CellChat.Rmd`
-
-### Figure 2.
-![overview](./figures/pipeline_overview.png)
-
-## Results 
-
-![results1](./figures/MaxFuse_integration_results.png)
-
-![results2](./figures/tangram_313_scRNAfeatures_MERFISHlabels.png)
-
-![results3](./figures/MERFISH_integrated_spatial.png)
 
 ## Future directions 
 
