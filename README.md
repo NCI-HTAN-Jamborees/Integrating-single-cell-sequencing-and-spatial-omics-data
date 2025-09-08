@@ -32,6 +32,7 @@ Figure 1 shows total cell counts from the MERFISH samples. Each MERFISH dataset 
 - Map scRNA-seq transcriptional data into the MERFISH spatial context 
 - Determine pro's and con's of each integration method  
 - Draw novel biological conclusions from the integrated dataset 
+- **NEW: Perform binary classification on high-dimensional single-cell data** 
 
 ## Workflow and results
 
@@ -102,6 +103,32 @@ Figure 1 shows total cell counts from the MERFISH samples. Each MERFISH dataset 
     the analysis of these datasets. Other paired datasets with scRNA-seq, spatial transcriptomics, and spatial proteomics assays would be of particular interest for a multimodal integration analysis. 
   - A major goal of the HTAN data jamboree was to generate feedback for the HTAN data portal. While all data portals have a learning curve
     for usage, the HTAN data portal was generally useable. The biggest blocker for this project was navigating multiple different metadata sources from within the HTAN data portal to establish which samples were paired between the modalities. Given that multimodal analyses are a cornerstone of the HTAN project, linking paired samples in a more intuitive way would be very helpful for future work. 
+  - **NEW: Binary classification functionality** has been added to enable classification tasks on high-dimensional single-cell data,
+    including cell type classification, treatment response prediction, and spatial region classification. See `BINARY_CLASSIFICATION_README.md` for details.
+
+## Binary Classification Module
+
+A new binary classification module has been added to support classification tasks on high-dimensional single-cell data:
+
+- **File**: `binary_classification.py` - Core classification module
+- **Demo**: `binary_classification_demo.ipynb` - Comprehensive examples and tutorials  
+- **Tests**: `test_binary_classification.py` - Test suite for functionality verification
+- **Documentation**: `BINARY_CLASSIFICATION_README.md` - Detailed usage guide
+
+### Key Features:
+- Handles high-dimensional data (thousands of genes)
+- Automatic dimensionality reduction with PCA
+- Feature selection capabilities
+- Multiple classifier options (Logistic Regression, Random Forest, SVM)
+- Cross-validation for robust performance estimation
+- Integration with AnnData objects
+- Comprehensive evaluation and visualization
+
+### Use Cases:
+- **Cell Type Classification**: Tumor vs. normal cells
+- **Treatment Response**: Responsive vs. non-responsive cells
+- **Spatial Classification**: Core vs. periphery regions
+- **Molecular Signatures**: Classification based on gene expression patterns 
 
 ## Team 
 
